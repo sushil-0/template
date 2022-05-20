@@ -6,6 +6,10 @@ on:
 #       - main
     
   workflow_call:
+    outputs:
+      envs:
+        description: "Whitelabels Environments"
+        value: ${{ jobs.envs.outputs.matrix }}
 
 jobs:
   envs:
