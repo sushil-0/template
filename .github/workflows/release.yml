@@ -1,0 +1,31 @@
+name: Github Release
+
+on:
+  workflow_call:
+
+
+github-release:
+    name: Github Release
+    runs-on: ubuntu-latest
+    needs: build-publish
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: url
+
+      - id: releaseprep
+        run: |
+          cat >$CHANGELOG <<-EOD
+          Release ${GITHUB_REF#refs/tags/}
+          Download available:
+          EOD
+          cat url-* >> $CHANGELOG
+        env:
+          CHANGELOG: release.txt
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: release.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
