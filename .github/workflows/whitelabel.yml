@@ -3,7 +3,7 @@ name: Whitelabel Setup
 on:
   workflow_call:
     outputs:
-      whitelabels:
+      matrix:
         description: "Whitelabels Environments"
         value: ${{ jobs.envs.outputs.matrix }}
 
