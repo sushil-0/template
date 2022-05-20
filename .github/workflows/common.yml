@@ -1,0 +1,17 @@
+name: Common
+
+on:
+  push:
+    branches:    
+      - 'main'
+
+jobs:
+  envs:
+    name: Gather release environments
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{steps.env_matrix.outputs.matrix}}
+    steps:
+      - uses: actions/checkout@v2
+      - id: env_matrix
+        run: echo "::set-output name=matrix::$(curl --silent 'https://downloadshaw2eefaey.blob.core.windows.net/envs/envs.json' | jq  -c )"
