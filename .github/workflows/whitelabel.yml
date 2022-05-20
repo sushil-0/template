@@ -1,13 +1,9 @@
-name: Common
+name: Whitelabel Setup
 
 on:
-#   push:
-#     branches:    
-#       - main
-    
   workflow_call:
     outputs:
-      envs:
+      whitelabels:
         description: "Whitelabels Environments"
         value: ${{ jobs.envs.outputs.matrix }}
 
