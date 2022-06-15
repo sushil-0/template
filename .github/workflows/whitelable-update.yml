@@ -11,8 +11,10 @@ on:
     types: [created]
 
 jobs:
-  nane: Update tags
+  name: Update tags
+  
   runs-on: ubuntu-latest
+  
   steps:
     - name: Get latest tag
       run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)"
