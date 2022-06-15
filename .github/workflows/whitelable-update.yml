@@ -12,9 +12,9 @@ on:
 
 jobs:
   set_tag:
-    name: Update tags
+    name: Update Tags
     runs-on: ubuntu-latest
     steps:
-      - name: Get latest tag
+      - name: Get Latest Tag
         run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)"
   
