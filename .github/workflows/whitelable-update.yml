@@ -12,25 +12,33 @@ on:
     types: [created]
 
 jobs:
+   set_tag:
+      name: Update Tags
+      runs-on: ubuntu-latest
+      outputs:
+        latest_tag: ${{ steps.latest_tag.outputs.LATEST_RELEASE_TAG }}
+      steps:
+        - uses: actions/checkout@v2
+        - name: Get Latest Tag
+          run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)"
 
-#   set_tag:
-#       name: Set latest release tag in env
-#       runs-on: ubuntu-latest
-#       outputs:
-#         latest_tag: ${{ steps.latest_tag.outputs.LATEST_RELEASE_TAG }}
-#       steps:
-#         - uses: actions/checkout@v2
-
-#         - id: latest_tag
-#           run: echo "::set-output name=LATEST_RELEASE_TAG::$(git describe --tags `git rev-list --tags --max-count=1`)"
-
-  get_tag:
-    name: Update Tags
-#     needs: set_tag
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Get Latest Tag
-#         run: echo "${{needs.set_tag.outputs.latest_tag}}"
-        run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)"
+        - name: Create tag
+          uses: actions/github-script@v5
+          with:
+            script: |
+              github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'refs/tags/<tagname>',
+                sha: context.sha
+              })
+#   get_tag:
+#     name: Update Tags
+# #     needs: set_tag
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Get Latest Tag
+# #         run: echo "${{needs.set_tag.outputs.latest_tag}}"
+#         run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)"
 
