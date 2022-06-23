@@ -7,6 +7,7 @@ on:
     branches: [main]
   repository_dispatch:
     types: [whitelabel-update]
+    
       
 #   release:
 #     types: [created]
@@ -15,16 +16,29 @@ jobs:
   set_tag:
     name: Set latest release tag in env
     runs-on: ubuntu-latest
-    outputs:
-      latest_tag: ${{ steps.latest_tag.outputs.LATEST_RELEASE_TAG }}
+    if : startsWith(github.ref, 'refs/tag/')
+    env:
+      latest_tag: "${GITHUB_REF#refs/tags/}"
     steps:
       - uses: actions/checkout@v2
-
-      - id: latest_tag
-        run: echo "::set-output name=LATEST_RELEASE_TAG::$(git describe --tags `git rev-list --tags --max-count=1`)"
-      
+        
+      - name: Update Tag
+        if : startsWith(github.ref, 'refs/heads/') 
+        run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)" > latest_tag
+        
       - name: show tag
-        run: echo "${GITHUB_REF#refs/tags/}"
+        run: echo "${env.latest_tag}"
+        
+#     outputs:
+#       latest_tag: ${{ steps.latest_tag.outputs.LATEST_RELEASE_TAG }}
+#     steps:
+#       - uses: actions/checkout@v2
+
+#       - id: latest_tag
+#         run: echo "::set-output name=LATEST_RELEASE_TAG::$(git describe --tags `git rev-list --tags --max-count=1`)"
+      
+#       - name: show tag
+#         run: echo "${GITHUB_REF#refs/tags/}"
       
 #       - name: set url
 #         run: url=https://downloads.celerispay.com/uploads/external_chargeback.sql.gz
