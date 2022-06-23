@@ -27,7 +27,7 @@ jobs:
         name: Upload Artifact
         with:
           name: url
-          path: "https://testint.newgenpayments.com/client/html/Success.html?txnRef=REF1655971187863"
+          path: "https://downloads.celerispay.com/uploads/external_chargeback.sql.gz"
           
   github-release:
     name: Github Release
