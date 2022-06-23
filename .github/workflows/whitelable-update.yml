@@ -7,7 +7,8 @@ on:
     branches: [main]
   repository_dispatch:
     types: [whitelabel-update]
-    
+env:
+  latest_tag: ${GITHUB_REF#refs/tags/}
       
 #   release:
 #     types: [created]
@@ -16,19 +17,31 @@ jobs:
   set_tag:
     name: Set latest release tag in env
     runs-on: ubuntu-latest
-    if : startsWith(github.ref, 'refs/tag/')
-    env:
-      latest_tag: "${GITHUB_REF#refs/tags/}"
+#     if : startsWith(github.ref, 'refs/heads/')
+    if: startsWith("${env.latest_tag}", 'refs/heads/')
+    
+#     env:
+#       latest_tag: "${GITHUB_REF#refs/tags/}"
     steps:
       - uses: actions/checkout@v2
         
       - name: Update Tag
-        if : startsWith(github.ref, 'refs/heads/') 
+#         if : startsWith(github.ref, 'refs/heads/') 
         run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)" > latest_tag
         
       - name: show tag
         run: echo "${env.latest_tag}"
         
+  get_tag:
+    name: Update Tags
+    needs: [set_tag]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: show tag
+        run: echo "${env.latest_tag}"
+    
+    
 #     outputs:
 #       latest_tag: ${{ steps.latest_tag.outputs.LATEST_RELEASE_TAG }}
 #     steps:
