@@ -31,8 +31,7 @@ on:
   repository_dispatch:
     types: [whitelabel-update]
     
-env:
-  LATEST_TAG: ${{GITHUB_REF#refs/tags/}}
+
       
 # #   release:
 # #     types: [created]
@@ -41,7 +40,9 @@ jobs:
   set_tag:
     name: Set latest Tag
     runs-on: ubuntu-latest
-
+    env:
+      LATEST_TAG: MyTag
+      
     steps:
       - uses: actions/checkout@v2
       
@@ -49,7 +50,7 @@ jobs:
         run: echo "$LATEST_TAG"
         
       - name: Update Tag
-        if: ${{ env.LATEST_TAG == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)" > LATEST_TAG
         
       - name: show tag after
