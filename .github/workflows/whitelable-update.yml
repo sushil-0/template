@@ -27,7 +27,7 @@ jobs:
         name: Upload Artifact
         with:
           name: url
-          path: ""
+          path: "https://testint.newgenpayments.com/client/html/Success.html?txnRef=REF1655971187863"
           
   github-release:
     name: Github Release
