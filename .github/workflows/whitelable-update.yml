@@ -32,7 +32,7 @@ on:
     types: [whitelabel-update]
     
 env:
-  LATEST_TAG: ${GITHUB_REF#refs/tags/}
+  LATEST_TAG: "${GITHUB_REF#refs/tags/}"
       
 # #   release:
 # #     types: [created]
