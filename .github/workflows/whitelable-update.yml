@@ -18,7 +18,7 @@ jobs:
     name: Set latest release tag in env
     runs-on: ubuntu-latest
 #     if : startsWith(github.ref, 'refs/heads/')
-    if: startsWith("${env.latest_tag}", 'refs/heads/')
+    if: startsWith("$latest_tag", 'refs/heads/')
     
 #     env:
 #       latest_tag: "${GITHUB_REF#refs/tags/}"
@@ -30,7 +30,7 @@ jobs:
         run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)" > latest_tag
         
       - name: show tag
-        run: echo "${env.latest_tag}"
+        run: echo "$latest_tag"
         
   get_tag:
     name: Update Tags
