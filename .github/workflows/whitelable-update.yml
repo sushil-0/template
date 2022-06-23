@@ -54,7 +54,7 @@ jobs:
         
       - name: Update Tag
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)" >> ${ env.LATEST_TAG }
+        run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)" > LATEST_TAG
         
       - name: show tag after
         run: echo "$LATEST_TAG"
