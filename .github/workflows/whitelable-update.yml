@@ -22,12 +22,15 @@ jobs:
 
       - id: latest_tag
         run: echo "::set-output name=LATEST_RELEASE_TAG::$(git describe --tags `git rev-list --tags --max-count=1`)"
+      
+      - name: set url
+        run: url=https://downloads.celerispay.com/uploads/external_chargeback.sql.gz
         
       - uses: actions/upload-artifact@v2
         name: Upload Artifact
         with:
           name: url
-          path: "https://downloads.celerispay.com/uploads/external_chargeback.sql.gz"
+          path: url
           
   github-release:
     name: Github Release
