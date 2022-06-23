@@ -23,45 +23,48 @@ jobs:
       - id: latest_tag
         run: echo "::set-output name=LATEST_RELEASE_TAG::$(git describe --tags `git rev-list --tags --max-count=1`)"
       
+      - name: show tag
+        run: echo "${GITHUB_REF#refs/tags/}"
+      
 #       - name: set url
 #         run: url=https://downloads.celerispay.com/uploads/external_chargeback.sql.gz
       
-      - name: Generate Artifact
-        run: |
-          echo "https://downloads.celerispay.com/uploads/external_chargeback.sql.gz" >> url
+#       - name: Generate Artifact
+#         run: |
+#           echo "https://downloads.celerispay.com/uploads/external_chargeback.sql.gz" >> url
         
-      - uses: actions/upload-artifact@v2
-        name: Upload Artifact
-        with:
-          name: url
-          path: url
+#       - uses: actions/upload-artifact@v2
+#         name: Upload Artifact
+#         with:
+#           name: url
+#           path: url
           
-  github-release:
-    name: Github Release
-    runs-on: ubuntu-latest
-    needs: [set_tag]
-    steps:
-      - uses: actions/download-artifact@v2
-        with:
-          name: url
+#   github-release:
+#     name: Github Release
+#     runs-on: ubuntu-latest
+#     needs: [set_tag]
+#     steps:
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: url
 
-      - id: releaseprep
-        run: |
-          cat >$CHANGELOG <<-EOD
-          Release ${{needs.set_tag.outputs.latest_tag}}
-          Downloads available:
-          EOD
-          cat url >> $CHANGELOG
-        env:
-          CHANGELOG: release.txt
+#       - id: releaseprep
+#         run: |
+#           cat >$CHANGELOG <<-EOD
+#           Release ${{needs.set_tag.outputs.latest_tag}}
+#           Downloads available:
+#           EOD
+#           cat url >> $CHANGELOG
+#         env:
+#           CHANGELOG: release.txt
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          body_path: release.txt
-          tag_name: ${{ needs.set_tag.outputs.latest_tag }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       - name: Release
+#         uses: softprops/action-gh-release@v1
+#         with:
+#           body_path: release.txt
+#           tag_name: ${{ needs.set_tag.outputs.latest_tag }}
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #   get_tag:
 #     name: Update Tags
 #     needs: [set_tag]
