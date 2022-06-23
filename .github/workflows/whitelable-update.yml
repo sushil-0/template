@@ -51,7 +51,7 @@ jobs:
           Release ${{needs.set_tag.outputs.latest_tag}}
           Downloads available:
           EOD
-          cat url-* >> $CHANGELOG
+          cat url >> $CHANGELOG
         env:
           CHANGELOG: release.txt
 
