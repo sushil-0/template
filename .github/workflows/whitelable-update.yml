@@ -1,59 +1,59 @@
 name: Release
 
-on:
-  push:
-    tags:
-      - '*'
-    branches: [main]
-
-env:
-  DAY_OF_WEEK: Monday
-
-jobs:
-  greeting_job:
-    runs-on: ubuntu-latest
-    env:
-      Greeting: Hello
-    steps:
-      - name: "Say Hello Mona it's Monday"
-        if: ${{ env.DAY_OF_WEEK == 'Monday' }}
-        run: echo "$Greeting $First_Name. Today is $DAY_OF_WEEK!"
-        env:
-          First_Name: Mona
-
-# name: Release
-
 # on:
 #   push:
 #     tags:
 #       - '*'
 #     branches: [main]
-#   repository_dispatch:
-#     types: [whitelabel-update]
+
 # env:
-#   LATEST_TAG: ${GITHUB_REF#refs/tags/}
+#   DAY_OF_WEEK: Monday
+
+# jobs:
+#   greeting_job:
+#     runs-on: ubuntu-latest
+#     env:
+#       Greeting: Hello
+#     steps:
+#       - name: "Say Hello Mona it's Monday"
+#         if: ${{ env.DAY_OF_WEEK == 'Monday' }}
+#         run: echo "$Greeting $First_Name. Today is $DAY_OF_WEEK!"
+#         env:
+#           First_Name: Mona
+
+# name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+    branches: [main]
+  repository_dispatch:
+    types: [whitelabel-update]
+    
+env:
+  LATEST_TAG: ${GITHUB_REF#refs/tags/}
       
 # #   release:
 # #     types: [created]
 
-# jobs:
-#   set_tag:
-#     name: Set latest release tag in env
-#     runs-on: ubuntu-latest
-# #     if : startsWith(github.ref, 'refs/heads/')
-#     if: ${{env.LATEST_TAG == 'refs/heads/main'}}
-    
-# #     env:
-# #       latest_tag: "${GITHUB_REF#refs/tags/}"
-#     steps:
-#       - uses: actions/checkout@v2
+jobs:
+  set_tag:
+    name: Set latest Tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: show tag previous
+        run: echo "$LATEST_TAG"
         
-#       - name: Update Tag
-# #         if : startsWith(github.ref, 'refs/heads/') 
-#         run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)" > LATEST_TAG
+      - name: Update Tag
+        if: ${{ env.LATEST_TAG == 'refs/heads/main' }}
+        run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)" > LATEST_TAG
         
-#       - name: show tag
-#         run: echo "$latest_tag"
+      - name: show tag after
+        run: echo "$LATEST_TAG"
         
 #   get_tag:
 #     name: Update Tags
