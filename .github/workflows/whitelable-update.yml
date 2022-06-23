@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - '*'
+    branches: [main]
 
 env:
   DAY_OF_WEEK: Monday
