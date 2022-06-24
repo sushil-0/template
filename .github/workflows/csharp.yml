@@ -1,0 +1,113 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  envs:
+    name: Gather release environments
+    runs-on: self-hosted
+    if: startsWith(github.ref, 'refs/tags/')
+    outputs:
+      matrix: ${{steps.env_matrix.outputs.matrix}}
+    steps:
+      - uses: actions/checkout@v2
+      - id: env_matrix
+        run: echo "::set-output name=matrix::$(curl --silent 'https://downloadshaw2eefaey.blob.core.windows.net/envs/envs.json' | jq  -c )"
+
+  build-packege:
+    name: Build package
+    runs-on: windows-latest
+    needs: envs
+  - uses: actions/checkout@v2
+    
+    
+    if: startsWith(github.ref, 'refs/tags/')
+    strategy:
+      matrix:
+        env: ${{fromJson(needs.envs.outputs.matrix)}}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: microsoft/setup-msbuild@v1.1
+
+      - uses: nuget/setup-nuget@v1
+
+      - name: Import env
+        shell: bash
+        run: |
+          jq -r '. | to_entries[] | "\(.key)=\(.value)"' <<< '${{ toJSON(matrix.env) }}' | while read line; do echo "$line" >> $GITHUB_ENV ; done
+
+      - name: Whitelabel solution
+        shell: bash
+        run: |
+            sed -e "s;WHITELABEL_API_ENDPOINT;$WHITELABEL_API_ENDPOINT;1" -e "s;WHITELABEL_TEST_API_ENDPOINT;$WHITELABEL_TEST_API_ENDPOINT;1" -i Endpoint.cs || exit 1
+            
+      - name: Restore Packages
+        run: nuget restore GatewayCSharp.sln
+
+      - name: Build Solution
+        run: |
+          msbuild.exe /p:Configuration=Release GatewayCSharp.sln
+
+      - name: Evaluate target zip filename
+        id: target
+        shell: bash
+        run: echo "::set-output name=ZIP::gateway-${GITHUB_REF#refs/tags/}-${{env.WHITELABEL_BUILDNAME}}.zip"
+
+      - name: Package
+        run: |
+          Compress-Archive -Path .\bin\Release\* -DestinationPath .\${{steps.target.outputs.ZIP}}
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: url-${{env.WHITELABEL_BUILDNAME}}
+          path: ${{steps.target.outputs.ZIP}}
+  
+  github-release:
+    name: Github Release
+    runs-on: self-hosted
+    needs: [envs, build-packege]
+    if: startsWith(github.ref, 'refs/tags/')
+    strategy:
+      matrix:
+        env: ${{fromJson(needs.envs.outputs.matrix)}}
+      fail-fast: false
+    steps:
+      - name: Import env
+        run: |
+          jq -r '. | to_entries[] | "\(.key)=\(.value)"' <<< '${{ toJSON(matrix.env) }}' | while read line; do echo "$line" >> $GITHUB_ENV ; done
+          
+      - uses: actions/download-artifact@v2
+        with:
+          name: url-${{env.WHITELABEL_BUILDNAME}}
+        
+      - name: Publish
+        run: |
+          URL=$(azuploader upload gateway-${GITHUB_REF#refs/tags/}-${{env.WHITELABEL_BUILDNAME}}.zip -p cf -c csharp)
+          if [ -n "$URL" ]; then
+            echo " - $WHITELABEL_COMPANY: $URL" >> url-${{ env.WHITELABEL_BUILDNAME }}
+          fi
+        
+      - id: releaseprep
+        run: |
+          cat >$CHANGELOG <<-EOD
+          Release ${GITHUB_REF#refs/tags/}
+
+          Download available:
+
+          EOD
+          cat url-* >> $CHANGELOG
+        env:
+          CHANGELOG: release.txt
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: release.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
