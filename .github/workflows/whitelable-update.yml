@@ -46,18 +46,23 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         
-      - name: Set tag previous
-        run: echo "${GITHUB_REF#refs/tags/}" > LATEST_TAG
+#       - name: Set tag previous
+#         run: echo "${GITHUB_REF#refs/tags/}" > LATEST_TAG
         
-      - name: show tag previous
-        run: echo "$LATEST_TAG"
+#       - name: show tag previous
+#         run: echo "$LATEST_TAG"
         
-      - name: Update Tag
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)" > LATEST_TAG
+#       - name: Update Tag
+#         if: ${{ github.ref == 'refs/heads/main' }}
+#         run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)" > LATEST_TAG
         
-      - name: show tag after
-        run: echo "$LATEST_TAG"
+      - name: set tag
+        run: echo "GIT_TAG=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
+        
+      - name: show tag
+        run: echo "${env.GIT_TAG}"
+        
+        
         
 #   get_tag:
 #     name: Update Tags
