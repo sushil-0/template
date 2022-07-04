@@ -62,6 +62,14 @@ jobs:
       - name: show tag
         run: echo "$GIT_TAG"
         
+      - name: Get Previous tag
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        with:
+          fallback: 1.0.0
+      - name : show tag after
+        run: echo ${{ steps.previoustag.outputs.tag }}
+        
         
         
 #   get_tag:
