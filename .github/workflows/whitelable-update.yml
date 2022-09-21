@@ -1,28 +1,5 @@
 name: Release
 
-# on:
-#   push:
-#     tags:
-#       - '*'
-#     branches: [main]
-
-# env:
-#   DAY_OF_WEEK: Monday
-
-# jobs:
-#   greeting_job:
-#     runs-on: ubuntu-latest
-#     env:
-#       Greeting: Hello
-#     steps:
-#       - name: "Say Hello Mona it's Monday"
-#         if: ${{ env.DAY_OF_WEEK == 'Monday' }}
-#         run: echo "$Greeting $First_Name. Today is $DAY_OF_WEEK!"
-#         env:
-#           First_Name: Mona
-
-# name: Release
-
 on:
   push:
     tags:
@@ -46,15 +23,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         
-#       - name: Set tag previous
-#         run: echo "${GITHUB_REF#refs/tags/}" > LATEST_TAG
+      - name: Set tag previous
+        run: echo "${GITHUB_REF#refs/tags/}"  && echo "${GITHUB_REF#refs/tags/}" > LATEST_TAG
         
-#       - name: show tag previous
-#         run: echo "$LATEST_TAG"
+      - name: show tag previous
+        run: echo "$LATEST_TAG"
         
-#       - name: Update Tag
-#         if: ${{ github.ref == 'refs/heads/main' }}
-#         run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)" > LATEST_TAG
+      - name: Update Tag
+#         if: startsWith(github.ref, 'refs/tags/')
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: echo "$(git describe --tags `git rev-list --tags --max-count=1`)" > LATEST_TAG
         
       - name: set tag
         run: echo "GIT_TAG=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
@@ -62,13 +40,34 @@ jobs:
       - name: show tag
         run: echo "$GIT_TAG"
         
-      - name: Get Previous tag
-        id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-        with:
-          fallback: 1.0.0
-      - name : show tag after
-        run: echo ${{ steps.previoustag.outputs.tag }}
+     
+
+
+
+# on:
+#   push:
+#     tags:
+#       - '*'
+#     branches: [main]
+
+# env:
+#   DAY_OF_WEEK: Monday
+
+# jobs:
+#   greeting_job:
+#     runs-on: ubuntu-latest
+#     env:
+#       Greeting: Hello
+#     steps:
+#       - name: "Say Hello Mona it's Monday"
+#         if: ${{ env.DAY_OF_WEEK == 'Monday' }}
+#         run: echo "$Greeting $First_Name. Today is $DAY_OF_WEEK!"
+#         env:
+#           First_Name: Mona
+
+# name: Release
+
+
         
         
         
