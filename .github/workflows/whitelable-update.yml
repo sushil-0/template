@@ -16,7 +16,7 @@ on:
 jobs:
   set_tag:
     name: Set latest release tag in env
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     outputs:
       latest_tag: ${{ steps.latest_tag.outputs.LATEST_RELEASE_TAG }}
     steps:
